@@ -570,6 +570,34 @@ This chapter also defines **Non-Functional Requirements (NFRs)** — the quality
 |----|---------------|-------------------|-------------|----------|------------|-------|
 | REQ-[###] | [Module name] | [Short descriptive title] | [One-line summary] | P0 / P1 / P2 | [US-###] | [Optional notes] |
 
+#### MoSCoW Priority Annotation Reference
+
+When filling in the **Priority** and **Notes** columns, use the following standard annotations to ensure consistency across all requirements:
+
+| Priority | Meaning | Annotation Format | Release Guidance |
+|----------|---------|-----------------|-----------------|
+| **P0 — Must Have** | Core functionality without which the product cannot ship. Failure here blocks launch. | `Must, MVP baseline` | Must ship in Sprint 1. Zero P0 defects allowed at release. |
+| **P1 — Should Have** | Important functionality that significantly impacts user experience or business outcomes. Deferring hurts but does not block. | `Should, important but not blocking` | Should ship in Sprint 1. If compressed, defer to Sprint 2 with PM approval. |
+| **P2 — Could Have** | Desirable enhancements that improve the product but are not essential. Ship if time and resources permit. | `Could, optional enhancement` | Ship if capacity allows. No delivery commitment. |
+| **P3 — Won't Have (This Release)** | Explicitly excluded from this release. May be revisited in future roadmap phases. | `Won't have, future roadmap` | Not in scope. Revisit in next planning cycle. |
+
+**Example — Feature List with Full Priority Annotations:**
+
+| Feature Module | Feature Name | Description | Priority | Notes |
+|----------------|-------------|-------------|----------|-------|
+| Feedback Submission | Feedback Form | Users can submit text feedback up to 2000 characters and select a problem type from a predefined list | P0 | Must, MVP baseline |
+| Feedback Submission | Feedback History | Users can view a list of their previously submitted feedback with status and timestamps | P0 | Must, MVP baseline |
+| Admin Management | Feedback List | Customer service team can view, filter, and search all submitted feedback | P1 | Should, important but not blocking |
+| Admin Management | Feedback Status Update | Customer service can update feedback status (Open → In Review → Resolved) | P1 | Should, important but not blocking |
+| Data Analysis | Analytics Dashboard | Display feedback volume and issue type distribution as charts and tables | P2 | Could, optional enhancement |
+| Data Analysis | Export to CSV | Allow admins to export filtered feedback data as a CSV file | P2 | Could, optional enhancement |
+| Notifications | Email Notification to Submitter | Send email confirmation to the user after feedback is submitted | P0 | Must, MVP baseline |
+| Notifications | Status Change Notification | Notify the user via email when their feedback status is updated | P1 | Should, important but not blocking |
+| Attachments | Screenshot Upload | Allow users to upload up to 3 image attachments (JPG/PNG/GIF, max 5MB each) | P1 | Should, important but not blocking |
+| Security | Rate Limiting | Limit feedback submissions to 10 per user per hour to prevent abuse | P0 | Must, MVP baseline |
+| Security | Input Sanitization | Sanitize all user-submitted text to prevent XSS and injection attacks | P0 | Must, MVP baseline |
+| Reporting | Weekly Summary Report | Generate a weekly email digest of feedback volume and top issues for the admin team | P2 | Could, optional enhancement |
+
 #### 3.1.2 P0 — Must Have
 
 ##### REQ-[INV-001]: [Requirement Title]
@@ -1324,7 +1352,7 @@ The Given/When/Then format is not a stylistic preference — it is a precision t
 
 ### Example Content
 
-> **Example Product:** SwiftStock — Multi-Warehouse Inventory Sync Module (continued)
+> **Example Product A:** SwiftStock — Multi-Warehouse Inventory Sync Module (continued)
 
 ---
 
@@ -1590,6 +1618,83 @@ The Given/When/Then format is not a stylistic preference — it is a precision t
 - **Given:** Marcus has 4 warehouses connected: W1 (320 units SKU-4421), W2 (44 units), W3 (95 units), W4 (210 units). All warehouses are in "Active" sync state.
 - **When:** Three events occur simultaneously within a 1-second window: (1) W1 processes a goods issue of 50 units. (2) W3 processes a goods receipt of 20 units. (3) W4 processes a goods issue of 100 units. All events are pushed via WebSocket.
 - **Then:** Each affected warehouse cell updates independently with the correct new value. No event is lost. Events are processed in correct timestamp order. Stock totals reflect: W1: 270, W2: 44, W3: 115, W4: 110. All three updates arrive within the 5-minute P95 sync latency requirement. The dashboard renders each updated cell without visual artifacts (no overlapping updates, no flash conflicts).
+```
+
+---
+
+> **Example Product B:** HelpDesk Pro — Customer Feedback Submission Module
+>
+> The following example demonstrates Given/When/Then acceptance criteria for a customer-facing feedback submission form, covering the primary user flow, required field validation, and attachment format validation.
+
+---
+
+```markdown
+## 5. Acceptance Criteria (Continued)
+
+> **How to Read This Chapter:** Each section corresponds to a requirement (REQ-###) from Chapter 3. Acceptance criteria are written in Given/When/Then format. Each criterion is independently executable and objectively verifiable. QA Engineers should be able to use these criteria directly as test case specifications without additional clarification.
+
+---
+
+### 5.5 Feedback Form Submission — Normal Flow (REQ-FB-001)
+
+**Feature Module:** Feedback Submission
+**Priority:** P0
+**Total Acceptance Criteria:** 3 criteria (1 primary flow, 1 validation flow, 1 attachment validation flow)
+
+---
+
+**Acceptance Criterion 1: Normal Submission**
+
+- **Given:** The user is logged in to HelpDesk Pro and is viewing the "Submit Feedback" page. The feedback form has loaded successfully with all fields accessible.
+- **When:** The user selects problem type "Function Issue," fills in the description field with "Submit button not clickable on the order confirmation page," uploads 1 screenshot (screenshot_order_issue.jpg, 2.3MB, JPG format), and clicks the "Submit" button.
+- **Then:** The system validates all fields within 500ms. The form is submitted successfully. The system displays a success message: "✅ Submission Successful — Your feedback ID is FB-2026-00001. Our team will review it within 24 hours." A feedback record is created in the database with the submitted data. The popup auto-closes after 3 seconds and the user is returned to the previous page.
+
+---
+
+**Acceptance Criterion 2: Required Field Validation — Missing Problem Type**
+
+- **Given:** The user opens the feedback form. The description field is empty and no problem type is selected.
+- **When:** The user clicks the "Submit" button without selecting a problem type.
+- **Then:** The system does not submit the form. An inline validation error appears below the problem type field: "⚠️ Please select a problem type." The error message is displayed in red text with an warning icon. The submit button remains in its enabled state. The form is not cleared — all user input (description text, uploaded files) is preserved. No network request to the submission endpoint is made.
+
+---
+
+**Acceptance Criterion 3: Attachment Format Validation — Unsupported File Type and Oversized File**
+
+- **Given:** The user clicks the "Upload Screenshot" button on the feedback form. The file picker dialog opens.
+- **When:** The user selects a 10MB PDF file (order_confirmation.pdf).
+- **Then:** The system validates the file immediately upon selection and rejects the upload. An error message is displayed below the upload area: "⚠️ Only JPG, PNG, GIF formats are supported. Single file maximum: 5MB. Selected file: order_confirmation.pdf (10MB)." The file is not uploaded to the server. The upload area remains empty (or shows only previously valid uploads). No partial upload is initiated. The file picker dialog closes.
+
+---
+
+### 5.6 Feedback Form Submission — Additional Flows (REQ-FB-001 / REQ-FB-002)
+
+**Feature Module:** Feedback Submission
+**Priority:** P0 / P1
+
+---
+
+**Acceptance Criterion 4: Multiple Attachment Upload — All Valid Files**
+
+- **Given:** The user is filling out the feedback form. The user has selected a valid problem type and entered a description.
+- **When:** The user uploads 3 files: screenshot_1.jpg (1.2MB), screenshot_2.png (800KB), error_log.gif (200KB). The user then clicks "Submit."
+- **Then:** All three files are uploaded successfully. The success message confirms the submission with a count: "3 attachments received." Each file thumbnail is displayed in the upload area with the filename and file size. The submission is processed with all attachments linked to the feedback record.
+
+---
+
+**Acceptance Criterion 5: Submission with Empty Description — Rejected**
+
+- **Given:** The user opens the feedback form and selects problem type "Function Issue."
+- **When:** The user clicks "Submit" without entering any description text.
+- **Then:** The system does not submit the form. An inline validation error appears below the description field: "⚠️ Please describe the issue before submitting." The problem type selection is preserved. No submission record is created.
+
+---
+
+**Acceptance Criterion 6: Admin Views Feedback with Attachments**
+
+- **Given:** A customer has submitted feedback FB-2026-00001 with 1 screenshot attached. A customer service agent is logged into the Admin Portal.
+- **When:** The agent navigates to the Feedback List, locates FB-2026-00001, and opens the feedback detail view.
+- **Then:** The agent can view the full feedback details: submitter name, problem type, description text, submission timestamp, and the attached screenshot. The agent can download the screenshot. The agent can update the feedback status (e.g., "In Review," "Resolved").
 ```
 
 ---

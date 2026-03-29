@@ -238,6 +238,15 @@ PRD-Writer activates when you use **any** of the following trigger words or phra
 | 9 | `product document` | 产品文档 |
 | 10 | `output a PRD` | 输出PRD |
 | 11 | `PRD template` | PRD模板 |
+| 12 | `draft a PRD` | 起草PRD |
+| 13 | `plan a PRD` | 规划PRD |
+| 14 | `compose a PRD` | 撰写PRD |
+| 15 | `organize a PRD` | 整理PRD |
+| 16 | `feature requirements` | 功能需求 |
+| 17 | `turn requirements into a document` | 把需求写成文档 |
+| 18 | `refine a PRD` | 完善PRD |
+| 19 | `optimize a PRD` | 优化PRD |
+| 20 | `complete a PRD` | 补全PRD |
 
 > **Tip**: You don't need an exact match — PRD-Writer understands intent. Just say "I need a PRD for a new feature" and it activates automatically.
 
@@ -328,4 +337,24 @@ We are grateful to the Anthropic team for advancing the state of the art in AI-a
 
 ---
 
-*Last updated: 2026-03-28 | PRD-Writer v1.0*
+*Last updated: 2026-03-30 | PRD-Writer v2.0.0*
+
+---
+
+## 📋 Changelog
+
+### v2.0.0 (2026-03-30)
+
+- **[Bug]** Fixed Lagging/Leading concept confusion in Success Metrics (Leading = 领先, Lagging = 滞后)
+- **[Improvement]** Template paths changed to relative paths for better portability
+- **[Improvement]** Trigger words expanded from 11 → 20
+- **[Improvement]** Added mode priority rules for A/B/C input mode conflicts
+- **[Improvement]** Added common error examples for Given/When/Then format
+- **[Improvement]** Reader Testing checklist split into 3 rounds (P0/P1/P2)
+- **[Improvement]** Added invalid input rejection rules
+- **[Improvement]** Added Entry/Exit Criteria for each phase
+- **[Enhancement]** Reader Testing now includes specific operational guidance
+
+### v1.0 (2026-03-28)
+
+- Initial release
